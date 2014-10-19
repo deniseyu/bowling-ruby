@@ -23,8 +23,18 @@ class Game
     @frames[n-1].spare 
   end
 
+  def later_frame(this_frame, frames_in_between)
+    @frames[this_frame - 1 + frames_in_between]
+  end
+
   def strike_points_frame(n)
-    @frames[n].points_this_frame + 10
+    if later_frame(n, 1).strike != true 
+      later_frame(n, 1).points_this_frame + 10
+    elsif later_frame(n, 1).strike == true && later_frame(n, 2).strike != true
+      later_frame(n, 2).points_this_frame + 20
+    elsif later_frame(n, 2).strike == true
+      return 30 
+    end
   end
 
   def running_total
