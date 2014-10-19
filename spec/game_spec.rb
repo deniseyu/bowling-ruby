@@ -38,12 +38,16 @@ describe Game do
 
     context "Strikes" do 
 
+      def add_all_frames(game, *frames)
+        frames.each { |frame| game.frames << frame }
+      end
+
+
       it "a frame containing a strike will be worth the subsequent open frame plus 10" do 
         allow(frame_one).to receive(:strike).and_return(true)
         allow(frame_two).to receive(:points_this_frame).and_return(5)
         allow(frame_two).to receive(:strike).and_return(false)
-        game.frames.push(frame_one)
-        game.frames.push(frame_two)
+        add_all_frames(game, frame_one, frame_two)
         expect(game.strike_points_frame(1)).to eq(15)
         expect(game.points_in_frame(2)).to eq(5)
         expect(game.running_total).to eq(20)
@@ -54,9 +58,7 @@ describe Game do
         allow(frame_two).to receive(:strike).and_return(true)
         allow(frame_three).to receive(:strike).and_return(false)
         allow(frame_three).to receive(:points_this_frame).and_return(5)
-        game.frames.push(frame_one)
-        game.frames.push(frame_two)
-        game.frames.push(frame_three)
+        add_all_frames(game, frame_one, frame_two, frame_three)
         expect(game.strike_points_frame(1)).to eq(25)
         expect(game.strike_points_frame(2)).to eq(15)
         expect(game.points_in_frame(3)).to eq(5)
@@ -69,10 +71,7 @@ describe Game do
         allow(frame_three).to receive(:strike).and_return(true)
         allow(frame_four).to receive(:strike).and_return(false)
         allow(frame_four).to receive(:points_this_frame).and_return(5)
-        game.frames.push(frame_one)
-        game.frames.push(frame_two)
-        game.frames.push(frame_three)
-        game.frames.push(frame_four)
+        add_all_frames(game, frame_one, frame_two, frame_three, frame_four)
         expect(game.strike_points_frame(1)).to eq(30)
         expect(game.strike_points_frame(2)).to eq(25)
         expect(game.strike_points_frame(3)).to eq(15)
@@ -80,7 +79,24 @@ describe Game do
         expect(game.running_total).to eq(75)
       end
 
+      it "sanity check to ensure that five consecutive strikes will work" do
+        frame_four = double :Frame
+        frame_five = double :Frame
+        frame_six = double :Frame
+        allow(frame_one).to receive(:strike).and_return(true)
+        allow(frame_two).to receive(:strike).and_return(true)
+        allow(frame_three).to receive(:strike).and_return(true)
+        allow(frame_four).to receive(:strike).and_return(true)
+        allow(frame_five).to receive(:strike).and_return(true)
+        allow(frame_six).to receive(:strike).and_return(false)
+        allow(frame_six).to receive(:points_this_frame).and_return(7)
+        add_all_frames(game, frame_one, frame_two, frame_three, frame_four, frame_five, frame_six)
+        expect(game.running_total).to eq(141)
+      end 
+
     end
+
+
 
   end
 
