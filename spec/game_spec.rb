@@ -137,6 +137,36 @@ describe Game do
 
     end
 
+    context "All together now" do 
+
+      let(:strike_frame) { double Frame, :strike => true, :spare => false }
+      let(:spare_frame) { double Frame, :strike => false, :spare => true }
+      let(:open_frame) { double Frame, :strike => false, :spare => false }
+
+      it "strike, spare, open" do 
+        allow(spare_frame).to receive(:points_this_frame).and_return(10)
+        allow(open_frame).to receive(:first_roll).and_return(3)
+        allow(open_frame).to receive(:points_this_frame).and_return(6)
+        add_all_frames(game, strike_frame, spare_frame, open_frame)
+        expect(game.strike_points_frame(1)).to eq(20)
+        expect(game.spare_points_frame(2)).to eq(13)
+        expect(game.points_in_frame(3)).to eq(6)
+        expect(game.running_total).to eq(39)
+      end
+
+      it "spare, strike, open" do 
+        allow(spare_frame).to receive(:points_this_frame).and_return(10)
+        allow(strike_frame).to receive(:first_roll).and_return(10)
+        allow(open_frame).to receive(:points_this_frame).and_return(4)
+        add_all_frames(game, spare_frame, strike_frame, open_frame)
+        expect(game.spare_points_frame(1)).to eq(20)
+        expect(game.strike_points_frame(2)).to eq(14)
+        expect(game.points_in_frame(3)).to eq(4)
+        expect(game.running_total).to eq(38)
+      end
+
+    end
+
   end
 
 end
