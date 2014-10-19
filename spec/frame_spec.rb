@@ -50,6 +50,11 @@ describe Frame do
       expect(frame.spare).not_to be(true)
     end
 
+    it "should know how many points were scored in the first roll" do 
+      allow(roll_one).to receive(:points).and_return(3)
+      expect(frame.first_roll).to eq 3
+    end
+
   end
 
   context "Extra roll in the tenth frame" do 

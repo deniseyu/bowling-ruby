@@ -32,9 +32,14 @@ class Game
       later_frame(n, 1).points_this_frame + 10
     elsif later_frame(n, 1).strike == true && later_frame(n, 2).strike != true
       later_frame(n, 2).points_this_frame + 20
-    elsif later_frame(n, 2).strike == true
+    elsif later_frame(n, 1).strike == true && later_frame(n, 2).strike == true 
       return 30 
+      # Consecutive strike bonuses max out at 30 points per frame
     end
+  end
+
+  def spare_points_frame(n)
+    later_frame(n, 1).first_roll + 10
   end
 
   def running_total
@@ -42,6 +47,8 @@ class Game
     @frames.to_enum.with_index.each do |frame, i|
       if strike_in_frame(i) 
         @total_points << strike_points_frame(i)
+      elsif spare_in_frame(i)
+        @total_points << spare_points_frame(i)
       else
         @total_points << points_in_frame(i)
       end

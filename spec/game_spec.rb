@@ -36,12 +36,16 @@ describe Game do
 
   context "The scoring mechanism:" do 
 
-    context "Strikes" do 
-
       def add_all_frames(game, *frames)
         frames.each { |frame| game.frames << frame }
       end
 
+    context "Strikes" do 
+
+      let(:frame_one) { double Frame, :spare => false }
+      let(:frame_two) { double Frame, :spare => false }
+      let(:frame_three) { double Frame, :spare => false }
+      let(:frame_four) { double Frame, :spare => false }
 
       it "a frame containing a strike will be worth the subsequent open frame plus 10" do 
         allow(frame_one).to receive(:strike).and_return(true)
@@ -80,9 +84,9 @@ describe Game do
       end
 
       it "sanity check to ensure that five consecutive strikes will work" do
-        frame_four = double :Frame
-        frame_five = double :Frame
-        frame_six = double :Frame
+        frame_four = double :Frame, :spare => false
+        frame_five = double :Frame, :spare => false
+        frame_six = double :Frame, :spare => false
         allow(frame_one).to receive(:strike).and_return(true)
         allow(frame_two).to receive(:strike).and_return(true)
         allow(frame_three).to receive(:strike).and_return(true)
@@ -91,12 +95,47 @@ describe Game do
         allow(frame_six).to receive(:strike).and_return(false)
         allow(frame_six).to receive(:points_this_frame).and_return(7)
         add_all_frames(game, frame_one, frame_two, frame_three, frame_four, frame_five, frame_six)
-        expect(game.running_total).to eq(141)
+        expect(game.running_total).to eq(141) # yay it works!
       end 
 
     end
 
+    context "Spares" do 
 
+      let(:frame_one) { double Frame, :strike => false }
+      let(:frame_two) { double Frame, :strike => false }
+      let(:frame_three) { double Frame, :strike => false }
+      let(:frame_four) { double Frame, :strike => false }
+
+      it "a spare followed by an open frame will be worth 
+      the first roll of the subsequent frame + 10" do
+        allow(frame_one).to receive(:spare).and_return(true)
+        allow(frame_two).to receive(:spare).and_return(false)
+        allow(frame_two).to receive(:first_roll).and_return(4)
+        allow(frame_two).to receive(:second_roll).and_return(3)
+        allow(frame_two).to receive(:points_this_frame).and_return(7)
+        add_all_frames(game, frame_one, frame_two)
+        expect(game.spare_points_frame(1)).to eq(14)
+        expect(game.points_in_frame(2)).to eq(7)
+        expect(game.running_total).to eq(21)
+      end
+
+      it "a spare followed by another spare will be worth the first roll of the next spare" do 
+        allow(frame_one).to receive(:spare).and_return(true)
+        allow(frame_two).to receive(:spare).and_return(true)
+        allow(frame_two).to receive(:first_roll).and_return(7)
+        allow(frame_two).to receive(:second_roll).and_return(3)
+        allow(frame_three).to receive(:spare).and_return(false)
+        allow(frame_three).to receive(:first_roll).and_return(3)
+        allow(frame_three).to receive(:points_this_frame).and_return(5)
+        add_all_frames(game, frame_one, frame_two, frame_three)
+        expect(game.spare_points_frame(1)).to eq(17)
+        expect(game.spare_points_frame(2)).to eq(13)
+        expect(game.points_in_frame(3)).to eq(5)
+        expect(game.running_total).to eq(35)
+      end
+
+    end
 
   end
 

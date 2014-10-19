@@ -18,6 +18,10 @@ class Frame
     true if self.points_this_frame == 10 && self.rolls[0].points != 10
   end
 
+  def first_roll
+    self.rolls[0].points 
+  end
+
 end
 
 class TenthFrame < Frame
