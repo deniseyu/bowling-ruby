@@ -40,6 +40,13 @@ describe Game do
         frames.each { |frame| game.frames << frame }
       end
 
+    it "can score a gutter game" do 
+        gutter_frame = double :Frame, :spare => false, :strike => false
+        10.times { add_all_frames(game, gutter_frame) } 
+        allow(gutter_frame).to receive(:points_this_frame).and_return(0)
+        expect(game.running_total).to eq 0
+      end
+
     context "Strikes" do 
 
       let(:frame_one) { double Frame, :spare => false }
@@ -97,6 +104,14 @@ describe Game do
         add_all_frames(game, frame_one, frame_two, frame_three, frame_four, frame_five, frame_six)
         expect(game.running_total).to eq(141) # yay it works!
       end 
+
+      it "can score a perfect game of 12 strikes" do
+        strike_frame = double :Frame, :spare => false, :strike => true
+        12.times { add_all_frames(game, strike_frame) } 
+        expect(game.frames.count).to eq 12
+        expect(game.strike_points_frame(10)).to eq 30
+        expect(game.running_total).to eq 300
+      end
 
     end
 

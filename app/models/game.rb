@@ -44,7 +44,7 @@ class Game
 
   def running_total
     @total_points = []
-    @frames.to_enum.with_index.each do |frame, i|
+    @frames.first(10).to_enum.with_index.each do |frame, i|
       if strike_in_frame(i) 
         @total_points << strike_points_frame(i)
       elsif spare_in_frame(i)
